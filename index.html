@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSWD 4Ps Management Information System</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f0f4f8;color:#1a1a1a;min-height:100vh;font-size:14px}
+.screen{display:none}.screen.on{display:flex}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── LOGIN ── */
+.lb{background:linear-gradient(150deg,#0A3D6B 0%,#0A5694 55%,#1a6bbf 100%);align-items:center;justify-content:center;min-height:100vh;padding:2rem;width:100%;display:flex}
+.lc{background:#fff;border:none;border-radius:18px;padding:2.5rem 2.75rem;width:100%;max-width:460px;box-shadow:0 12px 48px rgba(0,0,0,.3)}
+.dh{display:flex;align-items:center;gap:16px;margin-bottom:1.75rem;padding-bottom:1.4rem;border-bottom:3px solid #FCD116}
+.di .g{font-size:11px;color:#888;font-weight:500}
+.di .dept{font-size:12px;color:#0A5694;font-weight:700;line-height:1.5}
+.di .n{font-size:13px;font-weight:700;color:#0A3D6B;line-height:1.4;margin-top:1px}
+.lt{font-size:22px;font-weight:700;color:#0A3D6B;margin-bottom:4px}
+.ls{font-size:13px;color:#888;margin-bottom:1.5rem}
+.fl{display:block;font-size:13px;color:#444;margin-bottom:4px;margin-top:.9rem;font-weight:600}
+.fi{width:100%;padding:10px 13px;font-size:14px;border:2px solid #d0d3da;border-radius:9px;background:#fff;color:#1a1a1a;transition:border .15s}
+.fi:focus{outline:none;border-color:#0A5694;box-shadow:0 0 0 3px rgba(10,86,148,.1)}
+.unit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.9rem}
+.ub{padding:10px 12px;border:2px solid #d0d3da;border-radius:9px;background:#fff;cursor:pointer;transition:all .15s;text-align:center}
+.ub .ut{font-size:13px;font-weight:700;color:#1a1a1a}
+.ub:hover{border-color:#0A5694;background:#f0f7ff}
+.ub.sel{border-color:#0A5694;background:#0A5694}.ub.sel .ut{color:#fff}
+.lbtn{width:100%;margin-top:1.4rem;padding:13px;background:#FCD116;color:#0A3D6B;border:none;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s;letter-spacing:.3px}
+.lbtn:hover{background:#e8c000}
+.lerr{font-size:12px;color:#c0392b;margin-top:7px;display:none;background:#fee2e2;padding:7px 11px;border-radius:7px;font-weight:500}
+
+/* ── SHELL ── */
+.shell{flex:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── TOP HEADER BAR ── */
+.topbar{background:#0A3D6B;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;flex-shrink:0;border-bottom:3px solid #FCD116}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{width:38px;height:38px;object-fit:contain}
+.topbar-title{color:#fff;font-size:15px;font-weight:700;line-height:1.3}
+.topbar-title .sub{font-size:11px;opacity:.7;font-weight:400}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.topbar-user{display:flex;align-items:center;gap:9px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:#FCD116;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0A3D6B;flex-shrink:0}
+.user-info{text-align:right}
+.user-name{font-size:13px;font-weight:700;color:#fff}
+.user-role{font-size:11px;color:rgba(255,255,255,.6)}
+.logout-btn{padding:7px 14px;background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.logout-btn:hover{background:#FCD116;color:#0A3D6B;border-color:#FCD116}
+
+/* ── BODY AREA ── */
+.body-area{display:flex;flex:1;min-height:0}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;flex-shrink:0;background:#0A4A82;display:flex;flex-direction:column}
+.sb-top{padding:1rem 1.1rem .85rem;border-bottom:1px solid rgba(255,255,255,.12)}
+.sb-logo{color:#fff;font-size:13px;font-weight:700;line-height:1.5}
+.sb-logo .s{font-size:11px;opacity:.6;font-weight:400}
+.sb-nav{flex:1;padding:.5rem 0;overflow-y:auto}
+.ni{display:flex;align-items:center;gap:9px;padding:10px 1.1rem;color:rgba(255,255,255,.75);font-size:13px;cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+.ni svg{width:16px;height:16px;flex-shrink:0}
+.ni:hover{background:rgba(255,255,255,.1);color:#fff}
+.ni.active{background:rgba(255,255,255,.15);color:#fff;border-left-color:#FCD116}
+.ni.locked{opacity:.3;cursor:not-allowed;pointer-events:none}
+.ni .nbadge{margin-left:auto;background:#FCD116;color:#0A3D6B;font-size:10px;padding:2px 6px;border-radius:8px;font-weight:700}
+.sb-sect{padding:7px 1.1rem 2px;font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;background:#f0f4f8;overflow-y:auto;padding:1.4rem}
+.pg{display:none}.pg.on{display:block;animation:fu .2s ease}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.1rem}
+.pt{font-size:18px;font-weight:700;color:#0A3D6B}.ps{font-size:12px;color:#888;margin-top:3px}
+.unit-tag{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;margin-left:8px;vertical-align:middle}
+.tag-bdmu{background:#dbeafe;color:#1e40af}.tag-cvs{background:#dcfce7;color:#166534}
+.tag-grs{background:#fef3c7;color:#92400e}.tag-it{background:#ede9fe;color:#4c1d95}
+.tag-admin{background:#fee2e2;color:#991b1b}
+
+.abtn{padding:9px 16px;background:#0A5694;color:#fff;border:none;border-radius:9px;font-size:13px;cursor:pointer;font-weight:600;transition:background .15s}
+.abtn:hover{background:#084f87}
+
+/* ── STAT CARDS ── */
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.1rem}
+.sc{background:#fff;border:1.5px solid #e2e4e8;border-radius:12px;padding:1.1rem;border-top:4px solid #0A5694}
+.sc-l{font-size:12px;color:#888;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.sc-v{font-size:26px;font-weight:700;color:#0A3D6B}
+.sc-n{font-size:11px;margin-top:3px}
+.gr{color:#15803d}.rd{color:#dc2626}.mu{color:#888}
+
+/* ── PANELS ── */
+.panel{background:#fff;border:1.5px solid #e2e4e8;border-radius:14px;overflow:hidden;margin-bottom:1.1rem}
+.pnh{padding:1rem 1.25rem;border-bottom:2px solid #f0f4f8;display:flex;align-items:center;justify-content:space-between;background:#f8fafc}
+.pnt{font-size:14px;font-weight:700;color:#0A3D6B}
+.pnb{padding:1rem 1.25rem}
+.ld{width:8px;height:8px;border-radius:50%;background:#15803d;display:inline-block;animation:pu 1.5s infinite;margin-right:6px}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+
+.t2{display:grid;grid-template-columns:1fr 300px;gap:1.1rem}
+
+/* ── TABLES ── */
+.tbl{width:100%;font-size:13px;border-collapse:collapse;table-layout:fixed}
+.tbl th{text-align:left;padding:9px 11px;font-size:11px;font-weight:700;color:#0A5694;background:#f0f6ff;border-bottom:2px solid #dbeafe;letter-spacing:.3px;text-transform:uppercase}
+.tbl td{padding:9px 11px;border-bottom:1px solid #f0f4f8;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#f8fafc}
+.tbl .emp td{text-align:center;color:#aaa;white-space:normal;padding:2.5rem;font-size:13px}
+
+/* ── BADGES ── */
+.bdg{display:inline-block;padding:3px 9px;border-radius:8px;font-size:11px;font-weight:700}
+.bg{background:#dcfce7;color:#166534}.by{background:#fef3c7;color:#92400e}
+.br{background:#fee2e2;color:#991b1b}.bb{background:#dbeafe;color:#1e40af}
+.bp{background:#ede9fe;color:#4c1d95}
+
+/* ── ACTIVITY LOG ── */
+.alog .ai{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid #f0f4f8;font-size:12px}
+.alog .ai:last-child{border-bottom:none}
+.ad{width:8px;height:8px;border-radius:50%;background:#0A5694;margin-top:3px;flex-shrink:0}
+.at{color:#1a1a1a;line-height:1.5}.atm{color:#aaa;font-size:11px}
+
+/* ── SEARCH BAR ── */
+.sbar{display:flex;gap:8px;margin-bottom:1rem}
+.sbar input,.sbar select{padding:8px 10px;font-size:13px;border:1.5px solid #d0d3da;border-radius:9px;background:#fff;color:#1a1a1a}
+.sbar input{flex:1}
+.sbar input:focus,.sbar select:focus{outline:none;border-color:#0A5694}
+
+/* ── MODAL ── */
+.mw{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.mw.open{display:flex}
+.modal{background:#fff;border:none;border-radius:14px;width:540px;max-width:95%;max-height:88vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,.2)}
+.mh{padding:1.1rem 1.4rem;border-bottom:2px solid #f0f4f8;display:flex;align-items:center;justify-content:space-between;background:#f8fafc}
+.mh h3{font-size:15px;font-weight:700;color:#0A3D6B}
+.mx{background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1}
+.mb{padding:1.25rem 1.4rem}
+.mf{padding:1rem 1.4rem;border-top:2px solid #f0f4f8;display:flex;justify-content:flex-end;gap:9px;background:#f8fafc}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.fg{margin-bottom:.9rem}
+.fg label{display:block;font-size:12px;color:#555;margin-bottom:4px;font-weight:600}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 11px;font-size:13px;border:1.5px solid #d0d3da;border-radius:9px;background:#fff;color:#1a1a1a;transition:border .15s}
+.fg textarea{resize:vertical;min-height:65px}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:#0A5694;box-shadow:0 0 0 3px rgba(10,86,148,.08)}
+.bcan{padding:8px 16px;background:#fff;border:1.5px solid #d0d3da;border-radius:9px;font-size:13px;cursor:pointer;color:#1a1a1a;font-weight:600}
+.bcan:hover{background:#f4f5f7}
+.bsav{padding:8px 16px;background:#0A5694;color:#fff;border:none;border-radius:9px;font-size:13px;cursor:pointer;font-weight:600}
+.bsav:hover{background:#084f87}
+.banner{border-radius:9px;padding:.8rem 1rem;font-size:13px;margin-bottom:1rem;font-weight:500}
+.ban-y{background:#fef3c7;border:1.5px solid #f59e0b;color:#92400e}
+.ban-b{background:#dbeafe;border:1.5px solid #93c5fd;color:#1e40af}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:18px;right:18px;background:#0A3D6B;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;z-index:999;display:none;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);border-left:4px solid #FCD116}
+</style>
+</head>
+<body>
+
+<div style="position:relative">
+
+<!-- ═══════════════════════════ LOGIN ═══════════════════════════ -->
+<div class="screen on" id="loginScreen">
+  <div class="lb">
+    <div class="lc">
+      <div class="dh">
+        <img src="dswd-logo-login.jpg" alt="DSWD Logo" style="width:72px;height:72px;object-fit:contain;flex-shrink:0">
+        <div class="di">
+          <div class="g">Republic of the Philippines</div>
+          <div class="dept">Department of Social Welfare and Development</div>
+          <div class="n">4Ps Management Information System</div>
+        </div>
+      </div>
+      <div class="lt">Sign in to the System</div>
+      <div class="ls">Enter your credentials to access the 4Ps MIS</div>
+      <label class="fl">Username</label>
+      <input class="fi" id="lu" placeholder="Enter username">
+      <label class="fl">Password</label>
+      <input class="fi" type="password" id="lp" placeholder="Enter password">
+      <label class="fl" style="margin-bottom:6px">Unit / Role</label>
+      <div class="unit-grid">
+        <div class="ub sel" onclick="selUnit('admin',this)">
+          <div class="ut">Admin / Supervisor</div>
+        </div>
+        <div class="ub" onclick="selUnit('bdmu',this)">
+          <div class="ut">BDMU</div>
+        </div>
+        <div class="ub" onclick="selUnit('cvs',this)">
+          <div class="ut">CVS</div>
+        </div>
+        <div class="ub" onclick="selUnit('grs',this)">
+          <div class="ut">GRS</div>
+        </div>
+        <div class="ub" onclick="selUnit('it',this)" style="grid-column:span 2">
+          <div class="ut">IT — Information Technology</div>
+        </div>
+      </div>
+      <div class="lerr" id="lerr">Incorrect username or password. Please try again.</div>
+      <button class="lbtn" onclick="doLogin()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ APP SHELL ═══════════════════════════ -->
+<div class="screen" id="appScreen" style="flex-direction:column">
+
+  <!-- TOP HEADER -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <img src="dswd-logo-topbar.png" alt="DSWD" class="topbar-logo">
+      <div class="topbar-title">
+        DSWD 4Ps Management Information System
+        <div class="sub">Region I — Ilocos Norte / La Union</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <div class="user-info">
+          <div class="user-name" id="topbar-uname">—</div>
+          <div class="user-role" id="topbar-role">—</div>
+        </div>
+        <div class="user-avatar" id="topbar-avatar">?</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body-area">
+  <div class="sidebar">
+    <div class="sb-top">
+      <div class="sb-logo">Navigation
+        <div class="s">Select a module below</div>
+      </div>
+    </div>
+    <div class="sb-nav">
+      <div class="ni active" id="nav-dash" onclick="gp('dash',this)">
+        <svg viewBox="0 0 14 14" fill="currentColor">
+          <rect x="0" y="0" width="6" height="6" rx="1"/>
+          <rect x="8" y="0" width="6" height="6" rx="1"/>
+          <rect x="0" y="8" width="6" height="6" rx="1"/>
+          <rect x="8" y="8" width="6" height="6" rx="1"/>
+        </svg>Dashboard
+      </div>
+
+      <div class="sb-sect">BDMU</div>
+      <div class="ni" id="nav-bdmu" onclick="gp('bdmu',this)">
+        <svg viewBox="0 0 14 14" fill="currentColor">
+          <circle cx="7" cy="4" r="3"/>
+          <path d="M1 13c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+        </svg>Beneficiary Registry
+      </div>
+      <div class="ni" id="nav-enrol" onclick="gp('enrol',this)">
+        <svg viewBox="0 0 14 14" fill="currentColor">
+          <rect x="1" y="1" width="12" height="12" rx="1"/>
+          <path d="M4 5h6M4 7.5h6M4 10h4" stroke="currentColor" stroke-width="1" fill="none"/>
+        </svg>Program Enrollment
+      </div>
+
+      <div class="sb-sect">CVS</div>
+      <div class="ni" id="nav-cvs" onclick="gp('cvs',this)">
+        <svg viewBox="0 0 14 14" fill="currentColor">
+          <circle cx="7" cy="7" r="6"/>
+          <path d="M4 7l2 2 4-4" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+        </svg>Compliance Verification
+      </div>
+
+      <div class="sb-sect">GRS</div>
+      <div class="ni" id="nav-grs" onclick="gp('grs',this)">
+        <svg viewBox="0 0 14 14" fill="currentColor">
+          <path d="M2 1h10a1 1 0 011 1v7a1 1 0 01-1 1H8l-3 3v-3H2a1 1 0 01-1-1V2a1 1 0 011-1z" fill="none" stroke="currentColor" stroke-width="1"/>
+        </svg>Grievance Redress
+        <span class="nbadge" id="grs-badge" style="display:none">0</span>
+      </div>
+
+      <div class="sb-sect">IT</div>
+      <div class="ni" id="nav-it" onclick="gp('it',this)">
+        <svg viewBox="0 0 14 14" fill="currentColor">
+          <rect x="1" y="2" width="12" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1"/>
+          <path d="M4 12h6M7 10v2" stroke="currentColor" stroke-width="1" fill="none"/>
+        </svg>IT / System Admin
+      </div>
+    </div>
+  </div><!-- end sidebar -->
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="pg on" id="pg-dash">
+      <div class="ph">
+        <div>
+          <div class="pt">Dashboard <span class="unit-tag tag-admin">All Units</span></div>
+          <div class="ps"><span class="ld"></span>Live overview — 4Ps Management Information System</div>
+        </div>
+      </div>
+      <div class="sr">
+        <div class="sc">
+          <div class="sc-l">Registered Beneficiaries</div>
+          <div class="sc-v" id="s-benef">0</div>
+          <div class="sc-n mu">BDMU Registry</div>
+        </div>
+        <div class="sc">
+          <div class="sc-l">Compliance Rate</div>
+          <div class="sc-v" id="s-comp">—</div>
+          <div class="sc-n gr">CVS Verified</div>
+        </div>
+        <div class="sc">
+          <div class="sc-l">Open Grievances</div>
+          <div class="sc-v" id="s-griev">0</div>
+          <div class="sc-n rd">GRS Pending</div>
+        </div>
+        <div class="sc">
+          <div class="sc-l">System Users</div>
+          <div class="sc-v" id="s-users">5</div>
+          <div class="sc-n mu">IT Managed</div>
+        </div>
+      </div>
+      <div class="t2">
+        <div class="panel">
+          <div class="pnh">
+            <div class="pnt">Recent beneficiaries <span class="unit-tag tag-bdmu">BDMU</span></div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th style="width:32%">Name</th>
+                  <th style="width:24%">Municipality</th>
+                  <th style="width:18%">Program</th>
+                  <th style="width:12%">HH Size</th>
+                  <th style="width:14%">Status</th>
+                </tr>
+              </thead>
+              <tbody id="dash-tbl">
+                <tr class="emp"><td colspan="5">No beneficiaries yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="pnh"><div class="pnt">Activity log</div></div>
+            <div class="pnb alog" id="act-log">
+              <div class="ai">
+                <div class="ad"></div>
+                <div><div class="at">System initialized</div><div class="atm">Now</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="pnh"><div class="pnt">Unit summary</div></div>
+            <div class="pnb">
+              <table class="tbl">
+                <tr><td style="color:#888">BDMU — Beneficiaries</td><td style="text-align:right;font-weight:700" id="sum-benef">0</td></tr>
+                <tr><td style="color:#888">CVS — Verified</td><td style="text-align:right;font-weight:700" id="sum-cvs">0</td></tr>
+                <tr><td style="color:#888">GRS — Grievances</td><td style="text-align:right;font-weight:700" id="sum-grs">0</td></tr>
+                <tr><td style="color:#888">IT — Users</td><td style="text-align:right;font-weight:700" id="sum-it">5</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BDMU: BENEFICIARY REGISTRY -->
+    <div class="pg" id="pg-bdmu">
+      <div class="ph">
+        <div>
+          <div class="pt">Beneficiary Registry <span class="unit-tag tag-bdmu">BDMU</span></div>
+          <div class="ps">Household registration and profile management</div>
+        </div>
+        <button class="abtn" id="btn-addbenef" onclick="openM('mBenef')">+ Add Beneficiary</button>
+      </div>
+      <div class="panel">
+        <div class="pnb" style="padding-bottom:0">
+          <div class="sbar">
+            <input id="bq" placeholder="Search by name or municipality..." oninput="renderBenef()">
+            <select id="bfp" onchange="renderBenef()">
+              <option value="">All programs</option>
+              <option>4Ps</option><option>AICS</option><option>SLP</option><option>SWAD</option>
+            </select>
+            <select id="bfs" onchange="renderBenef()">
+              <option value="">All status</option>
+              <option>Active</option><option>Pending</option><option>Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:9%">ID</th>
+                <th style="width:20%">Name</th>
+                <th style="width:15%">Municipality</th>
+                <th style="width:11%">Barangay</th>
+                <th style="width:9%">Program</th>
+                <th style="width:7%">HH</th>
+                <th style="width:12%">Contact</th>
+                <th style="width:9%">Status</th>
+                <th style="width:8%">Action</th>
+              </tr>
+            </thead>
+            <tbody id="benef-tbl">
+              <tr class="emp"><td colspan="9">No beneficiaries registered yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BDMU: PROGRAM ENROLLMENT -->
+    <div class="pg" id="pg-enrol">
+      <div class="ph">
+        <div>
+          <div class="pt">Program Enrollment <span class="unit-tag tag-bdmu">BDMU</span></div>
+          <div class="ps">Track beneficiary enrollment per program</div>
+        </div>
+        <button class="abtn" id="btn-addenrol" onclick="openM('mEnrol')">+ Enroll Beneficiary</button>
+      </div>
+      <div class="sr" style="grid-template-columns:repeat(5,1fr)">
+        <div class="sc"><div class="sc-l">4Ps</div><div class="sc-v" id="e4ps">0</div></div>
+        <div class="sc"><div class="sc-l">AICS</div><div class="sc-v" id="eaics">0</div></div>
+        <div class="sc"><div class="sc-l">SLP</div><div class="sc-v" id="eslp">0</div></div>
+        <div class="sc"><div class="sc-l">SWAD</div><div class="sc-v" id="eswad">0</div></div>
+        <div class="sc"><div class="sc-l">Total</div><div class="sc-v" id="etot">0</div></div>
+      </div>
+      <div class="panel">
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:28%">Beneficiary</th>
+                <th style="width:14%">Program</th>
+                <th style="width:18%">Municipality</th>
+                <th style="width:16%">Grant Type</th>
+                <th style="width:12%">Date Enrolled</th>
+                <th style="width:12%">Status</th>
+              </tr>
+            </thead>
+            <tbody id="enrol-tbl">
+              <tr class="emp"><td colspan="6">No enrollment records yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CVS: COMPLIANCE VERIFICATION -->
+    <div class="pg" id="pg-cvs">
+      <div class="ph">
+        <div>
+          <div class="pt">Compliance Verification <span class="unit-tag tag-cvs">CVS</span></div>
+          <div class="ps">Verify health and education conditionalities for 4Ps beneficiaries</div>
+        </div>
+        <button class="abtn" id="btn-addcvs" onclick="openM('mCVS')">+ Add Verification</button>
+      </div>
+      <div class="sr">
+        <div class="sc">
+          <div class="sc-l">Total Verified</div>
+          <div class="sc-v" id="cv-tot">0</div>
+          <div class="sc-n mu">All records</div>
+        </div>
+        <div class="sc">
+          <div class="sc-l">Compliant</div>
+          <div class="sc-v" id="cv-comp">0</div>
+          <div class="sc-n gr">Passed</div>
+        </div>
+        <div class="sc">
+          <div class="sc-l">Non-Compliant</div>
+          <div class="sc-v" id="cv-nc">0</div>
+          <div class="sc-n rd">For follow-up</div>
+        </div>
+        <div class="sc">
+          <div class="sc-l">Compliance Rate</div>
+          <div class="sc-v" id="cv-rate">—</div>
+          <div class="sc-n mu">This period</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:22%">Beneficiary</th>
+                <th style="width:14%">Municipality</th>
+                <th style="width:18%">Conditionality</th>
+                <th style="width:12%">Period</th>
+                <th style="width:14%">Verified By</th>
+                <th style="width:10%">Date</th>
+                <th style="width:10%">Status</th>
+              </tr>
+            </thead>
+            <tbody id="cvs-tbl">
+              <tr class="emp"><td colspan="7">No compliance records yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRS: GRIEVANCE REDRESS -->
+    <div class="pg" id="pg-grs">
+      <div class="ph">
+        <div>
+          <div class="pt">Grievance Redress System <span class="unit-tag tag-grs">GRS</span></div>
+          <div class="ps">Receive, track, and resolve beneficiary complaints and grievances</div>
+        </div>
+        <button class="abtn" id="btn-addgrs" onclick="openM('mGRS')">+ New Grievance</button>
+      </div>
+      <div class="sr">
+        <div class="sc">
+          <div class="sc-l">Total Grievances</div>
+          <div class="sc-v" id="g-tot">0</div>
+          <div class="sc-n mu">All filed</div>
+        </div>
+        <div class="sc">
+          <div class="sc-l">Open</div>
+          <div class="sc-v" id="g-open">0</div>
+          <div class="sc-n rd">Unresolved</div>
+        </div>
+        <div class="sc">
+          <div class="sc-l">Under Review</div>
+          <div class="sc-v" id="g-rev">0</div>
+          <div class="sc-n mu">In progress</div>
+        </div>
+        <div class="sc">
+          <div class="sc-l">Resolved</div>
+          <div class="sc-v" id="g-res">0</div>
+          <div class="sc-n gr">Closed</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:10%">Ref #</th>
+                <th style="width:20%">Complainant</th>
+                <th style="width:16%">Municipality</th>
+                <th style="width:18%">Category</th>
+                <th style="width:12%">Date Filed</th>
+                <th style="width:12%">Assigned To</th>
+                <th style="width:12%">Status</th>
+              </tr>
+            </thead>
+            <tbody id="grs-tbl">
+              <tr class="emp"><td colspan="7">No grievances filed yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- IT: SYSTEM ADMINISTRATION -->
+    <div class="pg" id="pg-it">
+      <div class="ph">
+        <div>
+          <div class="pt">IT — System Administration <span class="unit-tag tag-it">IT</span></div>
+          <div class="ps">User management, system logs, and access control</div>
+        </div>
+        <button class="abtn" id="btn-addit" onclick="openM('mIT')">+ Add User</button>
+      </div>
+      <div class="banner ban-b" id="it-banner" style="display:none">
+        Access restricted. Only IT and Admin users can manage system accounts.
+      </div>
+      <div class="panel">
+        <div class="pnh"><div class="pnt">System user accounts</div></div>
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:20%">Name</th>
+                <th style="width:14%">Username</th>
+                <th style="width:16%">Unit</th>
+                <th style="width:15%">Role</th>
+                <th style="width:14%">Last Login</th>
+                <th style="width:11%">Status</th>
+                <th style="width:10%">Action</th>
+              </tr>
+            </thead>
+            <tbody id="it-tbl"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="pnh"><div class="pnt">System activity log</div></div>
+        <div class="pnb alog" id="it-log">
+          <div class="ai">
+            <div class="ad"></div>
+            <div><div class="at">System initialized — all units ready</div><div class="atm">Today</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .main -->
+  </div><!-- end .body-area -->
+
+<!-- ═══════════════════════════ MODALS ═══════════════════════════ -->
+
+<!-- BENEFICIARY MODAL -->
+<div class="mw" id="mBenef">
+  <div class="modal">
+    <div class="mh">
+      <h3>Add Beneficiary — BDMU</h3>
+      <button class="mx" onclick="closeM('mBenef')">×</button>
+    </div>
+    <div class="mb">
+      <div class="fr">
+        <div class="fg"><label>First name</label><input id="b-fn" placeholder="Juan"></div>
+        <div class="fg"><label>Last name</label><input id="b-ln" placeholder="dela Cruz"></div>
+      </div>
+      <div class="fr">
+        <div class="fg">
+          <label>Municipality</label>
+          <select id="b-mun">
+            <option>Bacnotan</option><option>San Fernando</option><option>Agoo</option>
+            <option>Bauang</option><option>Naguilian</option><option>Sto. Tomas</option>
+            <option>Caba</option><option>Luna</option><option>Bangar</option><option>Balaoan</option>
+          </select>
+        </div>
+        <div class="fg"><label>Barangay</label><input id="b-brgy" placeholder="Barangay name"></div>
+      </div>
+      <div class="fr">
+        <div class="fg">
+          <label>Program</label>
+          <select id="b-prog"><option>4Ps</option><option>AICS</option><option>SLP</option><option>SWAD</option></select>
+        </div>
+        <div class="fg"><label>Household size</label><input id="b-hh" type="number" value="4" min="1"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Contact number</label><input id="b-tel" placeholder="09XX-XXX-XXXX"></div>
+        <div class="fg">
+          <label>Status</label>
+          <select id="b-stat"><option>Active</option><option>Pending</option><option>Inactive</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>Remarks</label><textarea id="b-rmk" placeholder="Additional notes..."></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="bcan" onclick="closeM('mBenef')">Cancel</button>
+      <button class="bsav" onclick="saveBenef()">Save Beneficiary</button>
+    </div>
+  </div>
+</div>
+
+<!-- ENROLLMENT MODAL -->
+<div class="mw" id="mEnrol">
+  <div class="modal">
+    <div class="mh">
+      <h3>Program Enrollment — BDMU</h3>
+      <button class="mx" onclick="closeM('mEnrol')">×</button>
+    </div>
+    <div class="mb">
+      <div class="fg"><label>Beneficiary name</label><input id="en-name" placeholder="Full name"></div>
+      <div class="fr">
+        <div class="fg">
+          <label>Program</label>
+          <select id="en-prog"><option>4Ps</option><option>AICS</option><option>SLP</option><option>SWAD</option></select>
+        </div>
+        <div class="fg">
+          <label>Municipality</label>
+          <select id="en-mun">
+            <option>Bacnotan</option><option>San Fernando</option><option>Agoo</option>
+            <option>Bauang</option><option>Naguilian</option><option>Sto. Tomas</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Date enrolled</label><input id="en-date" type="date"></div>
+        <div class="fg">
+          <label>Grant type</label>
+          <select id="en-grant">
+            <option>Education Grant</option><option>Health Grant</option>
+            <option>Both (Education + Health)</option><option>Livelihood</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Enrolled by</label><input id="en-by" placeholder="BDMU staff name"></div>
+    </div>
+    <div class="mf">
+      <button class="bcan" onclick="closeM('mEnrol')">Cancel</button>
+      <button class="bsav" onclick="saveEnrol()">Save Enrollment</button>
+    </div>
+  </div>
+</div>
+
+<!-- CVS MODAL -->
+<div class="mw" id="mCVS">
+  <div class="modal">
+    <div class="mh">
+      <h3>Compliance Verification — CVS</h3>
+      <button class="mx" onclick="closeM('mCVS')">×</button>
+    </div>
+    <div class="mb">
+      <div class="fg"><label>Beneficiary name</label><input id="cv-name" placeholder="Full name"></div>
+      <div class="fr">
+        <div class="fg">
+          <label>Municipality</label>
+          <select id="cv-mun">
+            <option>Bacnotan</option><option>San Fernando</option><option>Agoo</option>
+            <option>Bauang</option><option>Naguilian</option><option>Sto. Tomas</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Conditionality type</label>
+          <select id="cv-type">
+            <option>Health — Pre/Postnatal</option>
+            <option>Health — Child Immunization</option>
+            <option>Education — School Attendance</option>
+            <option>Education — Enrollment</option>
+            <option>Family Development Session</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Verification period</label><input id="cv-period" placeholder="e.g. Q1 2026"></div>
+        <div class="fg"><label>Verified by</label><input id="cv-by" placeholder="CVS staff name"></div>
+      </div>
+      <div class="fr">
+        <div class="fg">
+          <label>Compliance status</label>
+          <select id="cv-status">
+            <option>Compliant</option><option>Non-Compliant</option><option>Excused</option>
+          </select>
+        </div>
+        <div class="fg"><label>Date verified</label><input id="cv-date" type="date"></div>
+      </div>
+      <div class="fg"><label>Remarks</label><textarea id="cv-rmk" placeholder="Details or reason for non-compliance..."></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="bcan" onclick="closeM('mCVS')">Cancel</button>
+      <button class="bsav" onclick="saveCVS()">Save Verification</button>
+    </div>
+  </div>
+</div>
+
+<!-- GRS MODAL -->
+<div class="mw" id="mGRS">
+  <div class="modal">
+    <div class="mh">
+      <h3>New Grievance — GRS</h3>
+      <button class="mx" onclick="closeM('mGRS')">×</button>
+    </div>
+    <div class="mb">
+      <div class="fr">
+        <div class="fg"><label>Complainant name</label><input id="gr-name" placeholder="Full name"></div>
+        <div class="fg">
+          <label>Municipality</label>
+          <select id="gr-mun">
+            <option>Bacnotan</option><option>San Fernando</option><option>Agoo</option>
+            <option>Bauang</option><option>Naguilian</option><option>Sto. Tomas</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg">
+          <label>Grievance category</label>
+          <select id="gr-cat">
+            <option>Exclusion Error</option><option>Inclusion Error</option>
+            <option>Delayed / Missing Grant</option><option>Compliance Issue</option>
+            <option>Staff Conduct</option><option>Program Policy</option><option>Others</option>
+          </select>
+        </div>
+        <div class="fg"><label>Date filed</label><input id="gr-date" type="date"></div>
+      </div>
+      <div class="fg"><label>Assigned GRS officer</label><input id="gr-officer" placeholder="Officer name"></div>
+      <div class="fg"><label>Description</label><textarea id="gr-desc" placeholder="Detailed description of the grievance..."></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="bcan" onclick="closeM('mGRS')">Cancel</button>
+      <button class="bsav" onclick="saveGRS()">File Grievance</button>
+    </div>
+  </div>
+</div>
+
+<!-- IT / ADD USER MODAL -->
+<div class="mw" id="mIT">
+  <div class="modal">
+    <div class="mh">
+      <h3>Add System User — IT</h3>
+      <button class="mx" onclick="closeM('mIT')">×</button>
+    </div>
+    <div class="mb">
+      <div class="fr">
+        <div class="fg"><label>Full name</label><input id="it-fn" placeholder="Full name"></div>
+        <div class="fg"><label>Username</label><input id="it-un" placeholder="username"></div>
+      </div>
+      <div class="fr">
+        <div class="fg">
+          <label>Unit</label>
+          <select id="it-unit">
+            <option>BDMU</option><option>CVS</option><option>GRS</option><option>IT</option><option>Admin</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Role</label>
+          <select id="it-role">
+            <option>Staff</option><option>Supervisor</option><option>Officer</option><option>Administrator</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Email</label><input id="it-email" placeholder="email@dswd.gov.ph"></div>
+      <div class="fg"><label>Password</label><input id="it-pw" type="password" placeholder="Set initial password"></div>
+    </div>
+    <div class="mf">
+      <button class="bcan" onclick="closeM('mIT')">Cancel</button>
+      <button class="bsav" onclick="saveUser()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+  </div><!-- end appScreen -->
+</div><!-- end position:relative wrapper -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════ JAVASCRIPT ═══════════════════════════ -->
+<script>
+const SUPABASE_URL = 'https://lfsjrgpgtbsqdywuhyfu.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxmc2pyZ3BndGJzcWR5d3VoeWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MDc1MTEsImV4cCI6MjA4OTE4MzUxMX0.ZJuLNdIiP-U0M2hDZ5J72W-sAxSaXptFUe346VlRzxc';
+
+// ── SUPABASE HELPER ─────────────────────────────────────────────────
+async function sb(table, method='GET', body=null, query='') {
+  const url = `${SUPABASE_URL}/rest/v1/${table}${query}`;
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': method === 'POST' ? 'return=representation' : ''
+  };
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('Supabase error:', err);
+    return null;
+  }
+  if (method === 'DELETE' || method === 'PATCH') return true;
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+// ── PERMISSIONS ─────────────────────────────────────────────────────
+const UNIT_LABELS = {
+  admin: 'Administrator', bdmu: 'BDMU Staff',
+  cvs: 'CVS Officer', grs: 'GRS Officer', it: 'IT Administrator'
+};
+const UNIT_ACCESS = {
+  admin: { addBenef:true, addEnrol:true, addCVS:true, addGRS:true, addIT:true },
+  bdmu:  { addBenef:true, addEnrol:true, addCVS:false,addGRS:false,addIT:false },
+  cvs:   { addBenef:false,addEnrol:false,addCVS:true, addGRS:false,addIT:false },
+  grs:   { addBenef:false,addEnrol:false,addCVS:false,addGRS:true, addIT:false },
+  it:    { addBenef:false,addEnrol:false,addCVS:false,addGRS:false,addIT:true }
+};
+const LOCKED_NAVS = {
+  bdmu: ['nav-cvs','nav-grs','nav-it'],
+  cvs:  ['nav-bdmu','nav-enrol','nav-grs','nav-it'],
+  grs:  ['nav-bdmu','nav-enrol','nav-cvs','nav-it'],
+  it:   ['nav-bdmu','nav-enrol','nav-cvs','nav-grs']
+};
+
+let curUnit = 'admin', curUser = '';
+let selU = 'admin';
+
+// ── ROLE SELECTOR ───────────────────────────────────────────────────
+function selUnit(u, el) {
+  selU = u;
+  document.querySelectorAll('.ub').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ── LOGIN ────────────────────────────────────────────────────────────
+async function doLogin() {
+  const u = document.getElementById('lu').value.trim().toLowerCase();
+  const p = document.getElementById('lp').value.trim();
+  const errEl = document.getElementById('lerr');
+  const btn = document.querySelector('.lbtn');
+  if (!u || !p) { showErr('Please enter username and password.'); return; }
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+  try {
+    const rows = await sb('users', 'GET', null,
+      `?username=eq.${encodeURIComponent(u)}&password=eq.${encodeURIComponent(p)}&status=eq.Active&limit=1`);
+    if (!rows || rows.length === 0) {
+      showErr('Incorrect username or password. Please try again.');
+      btn.textContent = 'Sign In'; btn.disabled = false; return;
+    }
+    const user = rows[0];
+    curUser = user.username;
+    curUnit = user.unit;
+    const uDisplay = user.full_name || (u.charAt(0).toUpperCase() + u.slice(1));
+    document.getElementById('topbar-uname').textContent = uDisplay;
+    document.getElementById('topbar-role').textContent = user.role || UNIT_LABELS[curUnit];
+    document.getElementById('topbar-avatar').textContent = uDisplay.charAt(0).toUpperCase();
+    errEl.style.display = 'none';
+    document.getElementById('loginScreen').classList.remove('on');
+    document.getElementById('appScreen').classList.add('on');
+    applyAccess();
+    await loadAllData();
+    logAct((UNIT_LABELS[curUnit] || curUnit) + ' signed in');
+    if      (curUnit === 'cvs')  gp('cvs',  document.getElementById('nav-cvs'));
+    else if (curUnit === 'grs')  gp('grs',  document.getElementById('nav-grs'));
+    else if (curUnit === 'bdmu') gp('bdmu', document.getElementById('nav-bdmu'));
+    else if (curUnit === 'it')   gp('it',   document.getElementById('nav-it'));
+    else                          gp('dash', document.getElementById('nav-dash'));
+  } catch(e) {
+    showErr('Connection error. Check your internet connection.');
+    console.error(e);
+  }
+  btn.textContent = 'Sign In'; btn.disabled = false;
+}
+
+function showErr(msg) {
+  const el = document.getElementById('lerr');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+document.getElementById('lp').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function doLogout() {
+  document.getElementById('appScreen').classList.remove('on');
+  document.getElementById('loginScreen').classList.add('on');
+  document.getElementById('lu').value = '';
+  document.getElementById('lp').value = '';
+  curUser = ''; curUnit = 'admin';
+}
+
+// ── ACCESS CONTROL ───────────────────────────────────────────────────
+function applyAccess() {
+  const a = UNIT_ACCESS[curUnit] || UNIT_ACCESS.bdmu;
+  const setVis = (id, show) => { const el = document.getElementById(id); if(el) el.style.display = show ? '' : 'none'; };
+  setVis('btn-addbenef', a.addBenef);
+  setVis('btn-addenrol', a.addEnrol);
+  setVis('btn-addcvs',   a.addCVS);
+  setVis('btn-addgrs',   a.addGRS);
+  setVis('btn-addit',    a.addIT);
+  const itBanner = document.getElementById('it-banner');
+  if (itBanner) itBanner.style.display = (curUnit !== 'it' && curUnit !== 'admin') ? 'block' : 'none';
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('locked'));
+  if (curUnit !== 'admin' && LOCKED_NAVS[curUnit]) {
+    LOCKED_NAVS[curUnit].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('locked'); });
+  }
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────────
+function gp(name, el) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.getElementById('pg-' + name).classList.add('on');
+  if (el) el.classList.add('active');
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────
+function openM(id)  { document.getElementById(id).classList.add('open'); }
+function closeM(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── TOAST ─────────────────────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2800);
+}
+
+// ── ACTIVITY LOG ──────────────────────────────────────────────────────
+function logAct(txt) {
+  const now = new Date();
+  const tm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  ['act-log','it-log'].forEach(logId => {
+    const log = document.getElementById(logId);
+    if (!log) return;
+    const d = document.createElement('div'); d.className = 'ai';
+    d.innerHTML = `<div class="ad"></div><div><div class="at">${txt}</div><div class="atm">${tm}</div></div>`;
+    log.insertBefore(d, log.firstChild);
+    if (log.children.length > 15) log.removeChild(log.lastChild);
+  });
+}
+
+// ── LOAD ALL DATA ─────────────────────────────────────────────────────
+async function loadAllData() {
+  showLoading(true);
+  try {
+    await Promise.all([
+      loadBeneficiaries(),
+      loadEnrollments(),
+      loadCompliance(),
+      loadGrievances(),
+      loadUsers()
+    ]);
+    refreshStats();
+  } catch(e) { console.error('Load error:', e); }
+  showLoading(false);
+}
+
+function showLoading(show) {
+  let el = document.getElementById('loadingBar');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loadingBar';
+    el.style.cssText = 'position:fixed;top:56px;left:0;right:0;height:3px;background:#FCD116;z-index:999;transition:opacity .3s';
+    document.body.appendChild(el);
+  }
+  el.style.opacity = show ? '1' : '0';
+}
+
+// ── BENEFICIARIES ─────────────────────────────────────────────────────
+let benefs = [];
+async function loadBeneficiaries() {
+  const rows = await sb('beneficiaries', 'GET', null, '?order=created_at.desc');
+  benefs = rows || [];
+  renderBenef();
+  renderDash();
+}
+
+function renderDash() {
+  const tb = document.getElementById('dash-tbl');
+  const recent = benefs.slice(0, 5);
+  if (!recent.length) { tb.innerHTML = '<tr class="emp"><td colspan="5">No beneficiaries yet</td></tr>'; return; }
+  tb.innerHTML = recent.map(b => `<tr>
+    <td>${b.first_name} ${b.last_name}</td>
+    <td>${b.municipality}</td><td>${b.program}</td><td>${b.household_size}</td>
+    <td><span class="bdg ${b.status==='Active'?'bg':b.status==='Pending'?'by':'br'}">${b.status}</span></td>
+  </tr>`).join('');
+}
+
+function renderBenef() {
+  const q  = (document.getElementById('bq')  || {value:''}).value.toLowerCase();
+  const pf = (document.getElementById('bfp') || {value:''}).value;
+  const sf = (document.getElementById('bfs') || {value:''}).value;
+  const f  = benefs.filter(b => {
+    const nm = (b.first_name + ' ' + b.last_name).toLowerCase();
+    return nm.includes(q) && (!pf || b.program === pf) && (!sf || b.status === sf);
+  });
+  const tb = document.getElementById('benef-tbl');
+  if (!tb) return;
+  if (!f.length) { tb.innerHTML = '<tr class="emp"><td colspan="9">No records found.</td></tr>'; return; }
+  tb.innerHTML = f.map(b => `<tr>
+    <td style="font-size:11px;color:#aaa">${b.beneficiary_code||'—'}</td>
+    <td>${b.first_name} ${b.last_name}</td>
+    <td>${b.municipality}</td><td>${b.barangay||'—'}</td><td>${b.program}</td>
+    <td>${b.household_size}</td><td>${b.contact_number||'—'}</td>
+    <td><span class="bdg ${b.status==='Active'?'bg':b.status==='Pending'?'by':'br'}">${b.status}</span></td>
+    <td><span style="font-size:11px;color:#0A5694;cursor:pointer" onclick="deleteBenef('${b.id}')">Delete</span></td>
+  </tr>`).join('');
+}
+
+async function saveBenef() {
+  const fn = document.getElementById('b-fn').value.trim();
+  const ln = document.getElementById('b-ln').value.trim();
+  if (!fn || !ln) { toast('Enter first and last name.'); return; }
+  const btn = document.querySelector('#mBenef .bsav');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  const data = {
+    first_name: fn, last_name: ln,
+    municipality: document.getElementById('b-mun').value,
+    barangay: document.getElementById('b-brgy').value,
+    program: document.getElementById('b-prog').value,
+    household_size: parseInt(document.getElementById('b-hh').value) || 1,
+    contact_number: document.getElementById('b-tel').value,
+    status: document.getElementById('b-stat').value,
+    remarks: document.getElementById('b-rmk').value,
+    created_by: curUser
+  };
+  const result = await sb('beneficiaries', 'POST', data);
+  btn.textContent = 'Save Beneficiary'; btn.disabled = false;
+  if (result) {
+    closeM('mBenef');
+    ['b-fn','b-ln','b-brgy','b-tel','b-rmk'].forEach(id => document.getElementById(id).value = '');
+    await loadBeneficiaries();
+    refreshStats();
+    logAct('BDMU: Beneficiary added — ' + fn + ' ' + ln);
+    toast('Beneficiary saved to database');
+  } else { toast('Error saving. Please try again.'); }
+}
+
+async function deleteBenef(id) {
+  if (!confirm('Delete this beneficiary record?')) return;
+  await sb('beneficiaries', 'DELETE', null, `?id=eq.${id}`);
+  await loadBeneficiaries();
+  refreshStats();
+  toast('Record deleted');
+}
+
+// ── ENROLLMENTS ───────────────────────────────────────────────────────
+let enrols = [];
+async function loadEnrollments() {
+  const rows = await sb('enrollments', 'GET', null, '?order=created_at.desc');
+  enrols = rows || [];
+  renderEnrolTable();
+  refreshEnrolStats();
+}
+
+function refreshEnrolStats() {
+  document.getElementById('e4ps').textContent  = enrols.filter(e => e.program === '4Ps').length;
+  document.getElementById('eaics').textContent = enrols.filter(e => e.program === 'AICS').length;
+  document.getElementById('eslp').textContent  = enrols.filter(e => e.program === 'SLP').length;
+  document.getElementById('eswad').textContent = enrols.filter(e => e.program === 'SWAD').length;
+  document.getElementById('etot').textContent  = enrols.length;
+}
+
+function renderEnrolTable() {
+  const tb = document.getElementById('enrol-tbl');
+  if (!tb) return;
+  if (!enrols.length) { tb.innerHTML = '<tr class="emp"><td colspan="6">No enrollment records yet.</td></tr>'; return; }
+  tb.innerHTML = enrols.map(r => `<tr>
+    <td>${r.beneficiary_name}</td><td>${r.program}</td>
+    <td>${r.municipality}</td><td>${r.grant_type||'—'}</td>
+    <td>${r.date_enrolled||'—'}</td>
+    <td><span class="bdg bg">${r.status}</span></td>
+  </tr>`).join('');
+}
+
+async function saveEnrol() {
+  const nm = document.getElementById('en-name').value.trim();
+  if (!nm) { toast('Enter beneficiary name.'); return; }
+  const btn = document.querySelector('#mEnrol .bsav');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  const data = {
+    beneficiary_name: nm,
+    program: document.getElementById('en-prog').value,
+    municipality: document.getElementById('en-mun').value,
+    grant_type: document.getElementById('en-grant').value,
+    date_enrolled: document.getElementById('en-date').value || new Date().toISOString().split('T')[0],
+    enrolled_by: document.getElementById('en-by').value || curUser,
+    status: 'Active'
+  };
+  const result = await sb('enrollments', 'POST', data);
+  btn.textContent = 'Save Enrollment'; btn.disabled = false;
+  if (result) {
+    closeM('mEnrol');
+    document.getElementById('en-name').value = '';
+    document.getElementById('en-by').value   = '';
+    await loadEnrollments();
+    logAct('BDMU: Enrolled ' + nm + ' → ' + data.program);
+    toast('Enrollment saved to database');
+  } else { toast('Error saving. Please try again.'); }
+}
+
+// ── COMPLIANCE (CVS) ─────────────────────────────────────────────────
+let cvsList = [];
+async function loadCompliance() {
+  const rows = await sb('compliance_records', 'GET', null, '?order=created_at.desc');
+  cvsList = rows || [];
+  renderCVSTable();
+  refreshCVSStats();
+}
+
+function refreshCVSStats() {
+  const comp = cvsList.filter(c => c.status === 'Compliant').length;
+  const rate = cvsList.length ? Math.round(comp / cvsList.length * 100) + '%' : '—';
+  document.getElementById('cv-rate').textContent = rate;
+  document.getElementById('cv-tot').textContent  = cvsList.length;
+  document.getElementById('cv-comp').textContent = comp;
+  document.getElementById('cv-nc').textContent   = cvsList.filter(c => c.status === 'Non-Compliant').length;
+  document.getElementById('s-comp').textContent  = rate;
+}
+
+function renderCVSTable() {
+  const tb = document.getElementById('cvs-tbl');
+  if (!tb) return;
+  if (!cvsList.length) { tb.innerHTML = '<tr class="emp"><td colspan="7">No compliance records yet.</td></tr>'; return; }
+  tb.innerHTML = cvsList.map(r => `<tr>
+    <td>${r.beneficiary_name}</td><td>${r.municipality}</td>
+    <td>${r.conditionality_type}</td><td>${r.verification_period||'—'}</td>
+    <td>${r.verified_by||'—'}</td><td>${r.date_verified||'—'}</td>
+    <td><span class="bdg ${r.status==='Compliant'?'bg':r.status==='Non-Compliant'?'br':'by'}">${r.status}</span></td>
+  </tr>`).join('');
+}
+
+async function saveCVS() {
+  const nm = document.getElementById('cv-name').value.trim();
+  if (!nm) { toast('Enter beneficiary name.'); return; }
+  const btn = document.querySelector('#mCVS .bsav');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  const data = {
+    beneficiary_name: nm,
+    municipality: document.getElementById('cv-mun').value,
+    conditionality_type: document.getElementById('cv-type').value,
+    verification_period: document.getElementById('cv-period').value,
+    verified_by: document.getElementById('cv-by').value || curUser,
+    date_verified: document.getElementById('cv-date').value || new Date().toISOString().split('T')[0],
+    status: document.getElementById('cv-status').value,
+    remarks: document.getElementById('cv-rmk').value
+  };
+  const result = await sb('compliance_records', 'POST', data);
+  btn.textContent = 'Save Verification'; btn.disabled = false;
+  if (result) {
+    closeM('mCVS');
+    ['cv-name','cv-period','cv-by','cv-rmk'].forEach(id => document.getElementById(id).value = '');
+    await loadCompliance();
+    logAct('CVS: Verified ' + nm + ' — ' + data.status);
+    toast('Verification saved to database');
+  } else { toast('Error saving. Please try again.'); }
+}
+
+// ── GRIEVANCES (GRS) ─────────────────────────────────────────────────
+let grsList = [];
+async function loadGrievances() {
+  const rows = await sb('grievances', 'GET', null, '?order=created_at.desc');
+  grsList = rows || [];
+  renderGRS();
+  refreshGRSStats();
+}
+
+function refreshGRSStats() {
+  const open = grsList.filter(g => g.status === 'Open').length;
+  document.getElementById('s-griev').textContent = open;
+  document.getElementById('g-tot').textContent   = grsList.length;
+  document.getElementById('g-open').textContent  = open;
+  document.getElementById('g-rev').textContent   = grsList.filter(g => g.status === 'Under Review').length;
+  document.getElementById('g-res').textContent   = grsList.filter(g => g.status === 'Resolved').length;
+  const badge = document.getElementById('grs-badge');
+  badge.textContent = open; badge.style.display = open > 0 ? 'inline' : 'none';
+}
+
+function renderGRS() {
+  const tb = document.getElementById('grs-tbl');
+  if (!tb) return;
+  if (!grsList.length) { tb.innerHTML = '<tr class="emp"><td colspan="7">No grievances filed yet.</td></tr>'; return; }
+  const canAct = (curUnit === 'grs' || curUnit === 'admin');
+  tb.innerHTML = grsList.map(g => {
+    const actions = canAct && g.status !== 'Resolved'
+      ? `<br><button onclick="updateGRS('${g.id}','Under Review')" style="font-size:10px;background:none;border:none;color:#1e40af;cursor:pointer;font-weight:700">Review</button>
+         <button onclick="updateGRS('${g.id}','Resolved')"    style="font-size:10px;background:none;border:none;color:#166534;cursor:pointer;font-weight:700">Resolve</button>` : '';
+    return `<tr>
+      <td style="font-size:10px">${g.reference_number||'—'}</td>
+      <td>${g.complainant_name}</td><td>${g.municipality}</td><td>${g.category}</td>
+      <td>${g.date_filed||'—'}</td><td>${g.assigned_officer||'—'}</td>
+      <td><span class="bdg ${g.status==='Open'?'br':g.status==='Under Review'?'by':'bg'}">${g.status}</span>${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function saveGRS() {
+  const nm = document.getElementById('gr-name').value.trim();
+  if (!nm) { toast('Enter complainant name.'); return; }
+  const btn = document.querySelector('#mGRS .bsav');
+  btn.textContent = 'Filing...'; btn.disabled = true;
+  const data = {
+    complainant_name: nm,
+    municipality: document.getElementById('gr-mun').value,
+    category: document.getElementById('gr-cat').value,
+    date_filed: document.getElementById('gr-date').value || new Date().toISOString().split('T')[0],
+    assigned_officer: document.getElementById('gr-officer').value || curUser,
+    description: document.getElementById('gr-desc').value,
+    status: 'Open'
+  };
+  const result = await sb('grievances', 'POST', data);
+  btn.textContent = 'File Grievance'; btn.disabled = false;
+  if (result) {
+    closeM('mGRS');
+    ['gr-name','gr-officer','gr-desc'].forEach(id => document.getElementById(id).value = '');
+    await loadGrievances();
+    logAct('GRS: Grievance filed — ' + nm + ' (' + data.category + ')');
+    toast('Grievance saved to database');
+  } else { toast('Error saving. Please try again.'); }
+}
+
+async function updateGRS(id, status) {
+  await sb('grievances', 'PATCH', { status }, `?id=eq.${id}`);
+  await loadGrievances();
+  logAct('GRS: Grievance marked as ' + status);
+  toast('Grievance updated — ' + status);
+}
+
+// ── USERS (IT) ────────────────────────────────────────────────────────
+let sysUsers = [];
+async function loadUsers() {
+  const rows = await sb('users', 'GET', null, '?order=created_at.asc');
+  sysUsers = rows || [];
+  renderITTable();
+}
+
+function renderITTable() {
+  const tb = document.getElementById('it-tbl');
+  if (!tb) return;
+  if (!sysUsers.length) { tb.innerHTML = '<tr class="emp"><td colspan="7">No users found.</td></tr>'; return; }
+  const canAct = (curUnit === 'it' || curUnit === 'admin');
+  tb.innerHTML = sysUsers.map((u) => `<tr>
+    <td>${u.full_name}</td>
+    <td style="font-size:11px;color:#888">${u.username}</td>
+    <td><span class="bdg ${u.unit==='bdmu'?'bb':u.unit==='cvs'?'bg':u.unit==='grs'?'by':u.unit==='it'?'bp':''}">${u.unit.toUpperCase()}</span></td>
+    <td>${u.role}</td><td>${u.email||'—'}</td>
+    <td><span class="bdg ${u.status==='Active'?'bg':'br'}">${u.status}</span></td>
+    <td>${canAct ? `<button onclick="toggleUser('${u.id}','${u.status}')" style="font-size:11px;background:none;border:none;color:${u.status==='Active'?'#991b1b':'#166534'};cursor:pointer;font-weight:700">${u.status==='Active'?'Disable':'Enable'}</button>` : '—'}</td>
+  </tr>`).join('');
+}
+
+async function toggleUser(id, currentStatus) {
+  const newStatus = currentStatus === 'Active' ? 'Disabled' : 'Active';
+  await sb('users', 'PATCH', { status: newStatus }, `?id=eq.${id}`);
+  await loadUsers();
+  logAct('IT: User ' + (newStatus === 'Active' ? 'enabled' : 'disabled'));
+  toast('User status updated');
+}
+
+async function saveUser() {
+  const fn = document.getElementById('it-fn').value.trim();
+  const un = document.getElementById('it-un').value.trim();
+  const pw = document.getElementById('it-pw') ? document.getElementById('it-pw').value.trim() : 'dswd2024';
+  if (!fn || !un) { toast('Enter name and username.'); return; }
+  const btn = document.querySelector('#mIT .bsav');
+  btn.textContent = 'Creating...'; btn.disabled = true;
+  const data = {
+    full_name: fn, username: un, password: pw,
+    unit: document.getElementById('it-unit').value.toLowerCase(),
+    role: document.getElementById('it-role').value,
+    email: document.getElementById('it-email').value,
+    status: 'Active'
+  };
+  const result = await sb('users', 'POST', data);
+  btn.textContent = 'Create Account'; btn.disabled = false;
+  if (result) {
+    closeM('mIT');
+    ['it-fn','it-un','it-email'].forEach(id => document.getElementById(id).value = '');
+    await loadUsers();
+    refreshStats();
+    logAct('IT: New user created — ' + fn + ' (' + un + ')');
+    toast('User account created in database');
+  } else { toast('Username may already exist. Try a different one.'); }
+}
+
+// ── GLOBAL STATS REFRESH ──────────────────────────────────────────────
+function refreshStats() {
+  document.getElementById('s-benef').textContent   = benefs.length;
+  document.getElementById('sum-benef').textContent = benefs.length;
+  document.getElementById('sum-cvs').textContent   = cvsList.length;
+  document.getElementById('sum-grs').textContent   = grsList.length;
+  document.getElementById('sum-it').textContent    = sysUsers.length;
+  document.getElementById('s-users').textContent   = sysUsers.length;
+  refreshCVSStats();
+  refreshGRSStats();
+  refreshEnrolStats();
+  renderDash();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+document.getElementById('en-date').valueAsDate = new Date();
+document.getElementById('cv-date').valueAsDate = new Date();
+document.getElementById('gr-date').valueAsDate = new Date();
+</script>
+
+</body>
+</html>
